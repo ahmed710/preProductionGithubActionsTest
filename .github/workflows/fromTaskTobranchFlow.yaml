@@ -1,0 +1,36 @@
+name: Create Branch and Pull Request on Issue Creation
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create-branch-and-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Extract Issue Information
+        id: extract
+        run: echo "::set-output name=issue_number::${{ github.event.issue.number }}"
+
+      - name: Create Branch
+        run: |
+          ISSUE_NUMBER="${{ steps.extract.outputs.issue_number }}"
+          BRANCH_NAME="issue-$ISSUE_NUMBER"
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+          title: "Feature: Issue ${{ steps.extract.outputs.issue_number }}"
+          body: |
+            This pull request is automatically generated for issue #${{ steps.extract.outputs.issue_number }}.
+          labels: |
+            auto-generated
+            enhancement
