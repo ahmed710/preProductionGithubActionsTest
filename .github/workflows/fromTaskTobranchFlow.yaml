@@ -27,7 +27,7 @@ jobs:
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV  # Setting BRANCH_NAME as an environment variable
           git checkout -b $BRANCH_NAME
           git push origin $BRANCH_NAME
-""
+
       - name: Link Branch to Issue
         run: |
           curl -X POST \
