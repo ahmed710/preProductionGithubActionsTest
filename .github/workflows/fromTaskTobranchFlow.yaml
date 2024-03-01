@@ -1,4 +1,4 @@
-name: Create Branch and Pull Request on Issue Creation
+name: Create Branch and Pull Request on Issue Creations
 
 on:
   issues:
