@@ -16,20 +16,35 @@ jobs:
         id: extract
         run: echo "::set-output name=issue_number::${{ github.event.issue.number }}"
 
+      - name: Get Issue Title
+        id: get_issue_title
+        run: echo "::set-output name=issue_title::$(echo "${{ github.event.issue.title }}" | tr -d '[:punct:]')"
+
+      - name: Debug Issue Information
+        run: |
+          echo "Issue Number: ${{ steps.extract.outputs.issue_number }}"
+          echo "Issue Title: ${{ steps.get_issue_title.outputs.issue_title }}"
+
       - name: Create Branch
+        id: create_branch
         run: |
           ISSUE_NUMBER="${{ steps.extract.outputs.issue_number }}"
-          ISSUE_TITLE="${{ github.event.issue.title }}"
-          BRANCH_NAME="issue-$ISSUE_NUMBER-$ISSUE_TITLE"
-          git checkout -b "$BRANCH_NAME"
-          git push origin "$BRANCH_NAME"
+          ISSUE_TITLE="${{ steps.get_issue_title.outputs.issue_title }}"
+          BRANCH_NAME="${ISSUE_NUMBER}-${ISSUE_TITLE}"
+          BRANCH_NAME=$(echo $BRANCH_NAME | tr -d '[:space:]')
+          echo "Branch Name: $BRANCH_NAME"
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
 
+      - name: Debug Pull Request Branch
+        run: |
+          echo "Pull Request Branch: ${{ steps.create_branch.outputs.branch_name }}"
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.head_ref }}
+          branch: ${{ steps.create_branch.outputs.branch_name }}
           title: "Feature: Issue ${{ steps.extract.outputs.issue_number }}"
           body: |
             This pull request is automatically generated for issue #${{ steps.extract.outputs.issue_number }}.
