@@ -17,7 +17,6 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: auto-update
+          branch: ${{ github.ref }}
           title: Automatically created pull request
           commit-message: Automatic pull request creation
-
