@@ -19,9 +19,11 @@ jobs:
       - name: Create Branch
         run: |
           ISSUE_NUMBER="${{ steps.extract.outputs.issue_number }}"
-          BRANCH_NAME="issue-$ISSUE_NUMBER"
-          git checkout -b $BRANCH_NAME
-          git push origin $BRANCH_NAME
+          ISSUE_TITLE="${{ github.event.issue.title }}"
+          BRANCH_NAME="issue-$ISSUE_NUMBER-$ISSUE_TITLE"
+          git checkout -b "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME"
+
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
