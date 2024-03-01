@@ -30,21 +30,22 @@ jobs:
         run: |
           ISSUE_NUMBER="${{ env.issue_number }}"
           ISSUE_TITLE="${{ env.issue_title }}"
-          BRANCH_NAME="${ISSUE_NUMBER}_${ISSUE_TITLE// /_}" 
+          BRANCH_NAME="${ISSUE_NUMBER}-${ISSUE_TITLE// /_}" 
           BRANCH_NAME=$(echo $BRANCH_NAME | tr -d '[:punct:]')
           echo "Branch Name: $BRANCH_NAME"
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV  
           git checkout -b $BRANCH_NAME
           git push origin $BRANCH_NAME
 
       - name: Debug Pull Request Branch
         run: |
-          echo "Pull Request Branch: ${BRANCH_NAME}"
+          echo "Pull Request Branch: ${{ env.BRANCH_NAME }}" 
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ BRANCH_NAME }}
+          branch: ${{ env.BRANCH_NAME }}
           title: "Feature: Issue ${{ env.issue_number }}"
           body: |
             This pull request is automatically generated for issue #${{ env.issue_number }}.
