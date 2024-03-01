@@ -38,13 +38,13 @@ jobs:
 
       - name: Debug Pull Request Branch
         run: |
-          echo "Pull Request Branch: ${{ steps.create_branch.outputs.branch_name }}"
+          echo "Pull Request Branch: $BRANCH_NAME"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ steps.create_branch.outputs.branch_name }}
+          branch: $BRANCH_NAME
           title: "Feature: Issue ${{ steps.extract.outputs.issue_number }}"
           body: |
             This pull request is automatically generated for issue #${{ steps.extract.outputs.issue_number }}.
