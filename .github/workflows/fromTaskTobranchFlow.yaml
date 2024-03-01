@@ -33,6 +33,7 @@ jobs:
           echo "BRANCH_NAME=${{ env.BRANCH_NAME }}"
 
       - name: Link Branch to Issue
+        if: "!contains(github.event.issue.body, 'skip workflow')"
         run: |
           curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
