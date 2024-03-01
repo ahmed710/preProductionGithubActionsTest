@@ -3,9 +3,6 @@ name: Create Branch and Pull Request on Issue Creation
 on:
   issues:
     types: [opened]
-  push:
-    branches:
-      - '*'
 
 jobs:
   create-branch-and-pull-request:
@@ -30,23 +27,10 @@ jobs:
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV  # Setting BRANCH_NAME as an environment variable
           git checkout -b $BRANCH_NAME
           git push origin $BRANCH_NAME
-
+""
       - name: Link Branch to Issue
         run: |
           curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d "{\"body\":\"This branch has been created for this issue. You can view the pull request [here]($GITHUB_SERVER_URL/${{ github.repository }}/pull/${{ env.BRANCH_NAME }}).\"}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ env.issue_number }}/comments"
-
-  create-automatic-pull-request:
-    needs: create-branch-and-pull-request
-    runs-on: ubuntu-latest
-    if: startsWith(github.event.head_commit.message, 'PullRequest')
-
-    steps:
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
-        with:
-          title: ${{ github.event.head_commit.message }}
-          commit-message: ${{ github.event.head_commit.message }}
-          branch: ${{ env.BRANCH_NAME }}
