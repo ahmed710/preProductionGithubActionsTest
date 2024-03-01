@@ -3,6 +3,9 @@ name: Create Branch and Pull Request on Issue Creation
 on:
   issues:
     types: [opened]
+  push:
+    branches:
+      - '*'
 
 jobs:
   create-branch-and-pull-request:
@@ -21,12 +24,16 @@ jobs:
         run: |
           ISSUE_NUMBER="${{ env.issue_number }}"
           ISSUE_TITLE="${{ env.issue_title }}"
-          BRANCH_NAME="${ISSUE_NUMBER}_${ISSUE_TITLE// /_}"  # Replace spaces with underscores
+          BRANCH_NAME="${ISSUE_NUMBER}_${ISSUE_TITLE// /_}"
           BRANCH_NAME=$(echo $BRANCH_NAME | tr -d '[:punct:]')
           echo "Branch Name: $BRANCH_NAME"
-          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV  # Setting BRANCH_NAME as an environment variable
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
           git checkout -b $BRANCH_NAME
           git push origin $BRANCH_NAME
+
+      - name: Debug Branch Name
+        run: |
+          echo "BRANCH_NAME=${{ env.BRANCH_NAME }}"
 
       - name: Link Branch to Issue
         run: |
