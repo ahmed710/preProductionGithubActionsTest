@@ -13,20 +13,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Extract Issue Information
-        id: extract
-        run: echo "issue_number=${{ github.event.issue.number }}" >> $GITHUB_ENV
-
-      - name: Get Issue Title
-        id: get_issue_title
-        run: echo "issue_title=${{ github.event.issue.title }}" >> $GITHUB_ENV
-
-      - name: Debug Issue Information
         run: |
-          echo "Issue Number: ${{ env.issue_number }}"
-          echo "Issue Title: ${{ env.issue_title }}"
+          echo "issue_number=${{ github.event.issue.number }}" >> $GITHUB_ENV
+          echo "issue_title=${{ github.event.issue.title }}" >> $GITHUB_ENV
 
       - name: Create Branch
-        id: create_branch
         run: |
           ISSUE_NUMBER="${{ env.issue_number }}"
           ISSUE_TITLE="${{ env.issue_title }}"
@@ -37,19 +28,13 @@ jobs:
           git checkout -b $BRANCH_NAME
           git push origin $BRANCH_NAME
 
+      - name: Link Branch to Issue
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d "{\"body\":\"This branch has been created for this issue. You can view the pull request [here]($GITHUB_SERVER_URL/${{ github.repository }}/pull/${{ env.BRANCH_NAME }}).\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ env.issue_number }}/comments"
+
       - name: Debug Pull Request Branch
         run: |
           echo "Pull Request Branch: ${{ env.BRANCH_NAME }}"  # Accessing BRANCH_NAME using env context
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: main
-          branch: ${{ env.BRANCH_NAME }}
-          title: "Feature: Issue ${{ env.issue_number }}"
-          body: |
-            This pull request is automatically generated for issue #${{ env.issue_number }}.
-          labels: |
-            auto-generated
-            enhancement
