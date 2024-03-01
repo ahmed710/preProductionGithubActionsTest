@@ -14,11 +14,11 @@ jobs:
 
       - name: Extract Issue Information
         id: extract
-        run: echo "{issue_number}={${{ github.event.issue.number }}}" >> $GITHUB_OUTPUT
+        run: echo "issue_number=${{ github.event.issue.number }}" >> $GITHUB_ENV
 
       - name: Get Issue Title
         id: get_issue_title
-        run: echo "{issue_title}={$(echo "${{ github.event.issue.title }}" | tr -d '[:punct:]')}" >> $GITHUB_OUTPUT
+        run: echo "issue_title=${{ github.event.issue.title }}" >> $GITHUB_ENV
 
       - name: Debug Issue Information
         run: |
@@ -30,8 +30,8 @@ jobs:
         run: |
           ISSUE_NUMBER="${{ steps.extract.outputs.issue_number }}"
           ISSUE_TITLE="${{ steps.get_issue_title.outputs.issue_title }}"
-          BRANCH_NAME="${ISSUE_NUMBER}-${ISSUE_TITLE}"
-          BRANCH_NAME=$(echo $BRANCH_NAME | tr -d '[:space:]')
+          BRANCH_NAME="${ISSUE_NUMBER}-${ISSUE_TITLE// /_}"  # Replace spaces with underscores
+          BRANCH_NAME=$(echo $BRANCH_NAME | tr -d '[:punct:]')
           echo "Branch Name: $BRANCH_NAME"
           git checkout -b $BRANCH_NAME
           git push origin $BRANCH_NAME
@@ -44,7 +44,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${BRANCH_NAME}
+          branch: ${{ steps.create_branch.outputs.BRANCH_NAME }}
           title: "Feature: Issue ${{ steps.extract.outputs.issue_number }}"
           body: |
             This pull request is automatically generated for issue #${{ steps.extract.outputs.issue_number }}.
