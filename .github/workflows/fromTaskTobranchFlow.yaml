@@ -39,7 +39,9 @@ jobs:
 
       - name: Debug Pull Request Branch
         run: |
-          echo "Pull Request Branch: ${{ env.BRANCH_NAME }}"  # Accessing BRANCH_NAME using env context
+          echo "Pull Request Branch: ${{ env.BRANCH_NAME }}" 
+          echo "GitHub Token: ${{ secrets.GITHUB_TOKEN }}"
+
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
