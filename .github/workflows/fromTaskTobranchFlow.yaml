@@ -18,7 +18,7 @@ jobs:
 
       - name: Get Issue Title
         id: get_issue_title
-        run: echo "{issue_title}::{$(echo "${{ github.event.issue.title }}" | tr -d '[:punct:]')}" >> $GITHUB_OUTPUT
+        run: echo "{issue_title}={$(echo "${{ github.event.issue.title }}" | tr -d '[:punct:]')}" >> $GITHUB_OUTPUT
 
       - name: Debug Issue Information
         run: |
