@@ -16,17 +16,14 @@ jobs:
         id: extract
         run: echo "::set-output name=issue_number::${{ github.event.issue.number }}"
 
-      - name: Get Issue Title
-        id: get_issue_title
-        run: echo "::set-output name=issue_title::$(echo "${{ github.event.issue.title }}" | tr -d '[:punct:]')"
-
       - name: Create Branch
         run: |
           ISSUE_NUMBER="${{ steps.extract.outputs.issue_number }}"
-          ISSUE_TITLE="${{ steps.get_issue_title.outputs.issue_title }}"
-          BRANCH_NAME="${ISSUE_NUMBER}-${ISSUE_TITLE}"
-          git checkout -b $BRANCH_NAME
-          git push origin $BRANCH_NAME
+          ISSUE_TITLE="${{ github.event.issue.title }}"
+          BRANCH_NAME="issue-$ISSUE_NUMBER-$ISSUE_TITLE"
+          git checkout -b "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME"
+
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
