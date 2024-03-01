@@ -22,14 +22,14 @@ jobs:
 
       - name: Debug Issue Information
         run: |
-          echo "Issue Number: ${{ steps.extract.outputs.issue_number }}"
-          echo "Issue Title: ${{ steps.get_issue_title.outputs.issue_title }}"
+          echo "Issue Number: ${{ env.issue_number }}"
+          echo "Issue Title: ${{ env.issue_title }}"
 
       - name: Create Branch
         id: create_branch
         run: |
-          ISSUE_NUMBER="${{ steps.extract.outputs.issue_number }}"
-          ISSUE_TITLE="${{ steps.get_issue_title.outputs.issue_title }}"
+          ISSUE_NUMBER="${{ env.issue_number }}"
+          ISSUE_TITLE="${{ env.issue_title }}"
           BRANCH_NAME="${ISSUE_NUMBER}-${ISSUE_TITLE// /_}"  # Replace spaces with underscores
           BRANCH_NAME=$(echo $BRANCH_NAME | tr -d '[:punct:]')
           echo "Branch Name: $BRANCH_NAME"
@@ -44,10 +44,10 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ steps.create_branch.outputs.BRANCH_NAME }}
-          title: "Feature: Issue ${{ steps.extract.outputs.issue_number }}"
+          branch: ${{ env.BRANCH_NAME }}
+          title: "Feature: Issue ${{ env.issue_number }}"
           body: |
-            This pull request is automatically generated for issue #${{ steps.extract.outputs.issue_number }}.
+            This pull request is automatically generated for issue #${{ env.issue_number }}.
           labels: |
             auto-generated
             enhancement
