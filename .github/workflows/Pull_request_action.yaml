@@ -20,3 +20,4 @@ jobs:
           branch: ${{ github.ref }}
           title: Automatically created pull request
           commit-message: Automatic pull request creation
+          base: main
